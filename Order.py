@@ -28,11 +28,26 @@ class PaymentManager(ABC):
         pass
 
 
-class DebitPayment(PaymentManager):
-    def __init__(self, security_code):
-        self.security_code = security_code
+class EmailAuthPayment(PaymentManager):
+    def email_auth(self, code):
+        pass
 
     def pay(self, order):
+        pass
+
+
+class DebitPayment(EmailAuthPayment):
+    def __init__(self, security_code):
+        self.security_code = security_code
+        self.authorized = False
+
+    def email_auth(self, code):
+        print(f"Verifying code {code}")
+        self.authorized = True
+
+    def pay(self, order):
+        if not self.authorized:
+            raise Exception("Not authorized to perform this operation")
         print("Processing debit payment type")
         print(f"Verifying security code: {self.security_code}")
         order.status = "paid"
@@ -65,5 +80,6 @@ order.add_item("USB cable", 2, 5)
 
 print(order.total_price())
 
-paymentManager = PaypalPayment("younes_belouche@blabla.com")
+paymentManager = DebitPayment("549651984")
+paymentManager.email_auth(9481818)
 paymentManager.pay(order)
