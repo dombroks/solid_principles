@@ -21,6 +21,24 @@ class Order:
         return total
 
 
+class Authorizer(ABC):
+    @abstractmethod
+    def is_authorized(self) -> bool:
+        pass
+
+
+class AuthorizerRobot(Authorizer):
+
+    def __init__(self):
+        self.authorized = False
+
+    def not_a_robot(self):
+        self.authorized = True
+
+    def is_authorized(self) -> bool:
+        return self.authorized
+
+
 class PaymentManager(ABC):
 
     @abstractmethod
@@ -28,25 +46,13 @@ class PaymentManager(ABC):
         pass
 
 
-class EmailAuthPayment(PaymentManager):
-    def email_auth(self, code):
-        pass
-
-    def pay(self, order):
-        pass
-
-
-class DebitPayment(EmailAuthPayment):
-    def __init__(self, security_code):
+class DebitPayment(PaymentManager):
+    def __init__(self, security_code, authorizer: AuthorizerRobot):
         self.security_code = security_code
-        self.authorized = False
-
-    def email_auth(self, code):
-        print(f"Verifying code {code}")
-        self.authorized = True
+        self.authorizer = authorizer
 
     def pay(self, order):
-        if not self.authorized:
+        if not self.authorizer.is_authorized():
             raise Exception("Not authorized to perform this operation")
         print("Processing debit payment type")
         print(f"Verifying security code: {self.security_code}")
@@ -80,6 +86,7 @@ order.add_item("USB cable", 2, 5)
 
 print(order.total_price())
 
-paymentManager = DebitPayment("549651984")
-paymentManager.email_auth(9481818)
+authorizer = AuthorizerRobot()
+authorizer.not_a_robot()
+paymentManager = DebitPayment("younes_belouche@blabla.com",authorizer)
 paymentManager.pay(order)
