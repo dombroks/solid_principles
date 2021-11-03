@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+
+
 class Order:
 
     def __init__(self):
@@ -18,13 +21,22 @@ class Order:
         return total
 
 
-class PaymentManager:
-    def pay_debit(self, order, security_code):
+class PaymentManager(ABC):
+
+    @abstractmethod
+    def pay(self, order, security_code):
+        pass
+
+
+class DebitPayment(PaymentManager):
+    def pay(self, order, security_code):
         print("Processing debit payment type")
         print(f"Verifying security code: {security_code}")
         order.status = "paid"
 
-    def pay_credit(self, order, security_code):
+
+class CreditPayment(PaymentManager):
+    def pay(self, order, security_code):
         print("Processing credit payment type")
         print(f"Verifying security code: {security_code}")
         order.status = "paid"
@@ -37,5 +49,5 @@ order.add_item("USB cable", 2, 5)
 
 print(order.total_price())
 
-paymentManager = PaymentManager()
-paymentManager.pay_debit(order, "0372846")
+debitPayment = DebitPayment()
+debitPayment.pay(order, "0372846")
