@@ -24,21 +24,37 @@ class Order:
 class PaymentManager(ABC):
 
     @abstractmethod
-    def pay(self, order, security_code):
+    def pay(self, order):
         pass
 
 
 class DebitPayment(PaymentManager):
-    def pay(self, order, security_code):
+    def __init__(self, security_code):
+        self.security_code = security_code
+
+    def pay(self, order):
         print("Processing debit payment type")
-        print(f"Verifying security code: {security_code}")
+        print(f"Verifying security code: {self.security_code}")
         order.status = "paid"
 
 
 class CreditPayment(PaymentManager):
-    def pay(self, order, security_code):
+    def __init__(self, security_code):
+        self.security_code = security_code
+
+    def pay(self, order):
         print("Processing credit payment type")
-        print(f"Verifying security code: {security_code}")
+        print(f"Verifying security code: {self.security_code}")
+        order.status = "paid"
+
+
+class PaypalPayment(PaymentManager):
+    def __init__(self, email_address):
+        self.email_address = email_address
+
+    def pay(self, order):
+        print("Processing paypal payment type")
+        print(f"Verifying security code: {self.email_address}")
         order.status = "paid"
 
 
@@ -49,5 +65,5 @@ order.add_item("USB cable", 2, 5)
 
 print(order.total_price())
 
-debitPayment = DebitPayment()
-debitPayment.pay(order, "0372846")
+paymentManager = PaypalPayment("younes_belouche@blabla.com")
+paymentManager.pay(order)
